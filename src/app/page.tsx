@@ -1,15 +1,21 @@
 import prisma from "@/lib/prisma";
 import { addTransaction } from "./actions";
 import ImportForm from "@/components/ImportForm";
+import CategoryPicker from "@/components/CategoryPicker";
 
 export default async function Home() {
+  
   const transactions = await prisma.transaction.findMany({
     include: {
       category: true,
     },
     orderBy: {
       date: 'desc',
-    },
+    }
+  });
+
+  const categories = await prisma.category.findMany({
+    orderBy: { name: 'asc' }
   });
 
   return (
@@ -21,10 +27,8 @@ export default async function Home() {
         <p className="text-gray-500 mt-2">Gerencie suas finanças de forma simples.</p>
       </header>
 
-      {/* Grid de Ações: Cadastro Manual e Importação */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         
-        {/* Lado Esquerdo: Cadastro Manual */}
         <section className="p-6 bg-white rounded-2xl border border-gray-200 shadow-sm">
           <h2 className="text-sm font-bold text-gray-400 uppercase mb-4">
             Novo Lançamento
@@ -83,9 +87,11 @@ export default async function Home() {
                 <tr key={t.id} className="hover:bg-blue-50/30 transition-colors group">
                   <td className="px-6 py-4 text-gray-700 font-medium">{t.description}</td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-500 text-xs font-medium">
-                      {t.category?.name || 'Sem Categoria'}
-                    </span>
+                     <CategoryPicker 
+                        transactionId={t.id} 
+                        currentCategoryId={t.categoryId} 
+                        categories={categories} 
+                      />
                   </td>
                   <td className={`px-6 py-4 text-right font-bold ${t.amount < 0 ? 'text-red-500' : 'text-emerald-500'}`}>
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.amount)}
