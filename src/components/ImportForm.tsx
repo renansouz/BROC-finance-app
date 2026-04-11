@@ -3,41 +3,47 @@
 import { importTransactions } from "@/app/actions"
 
 export default function ImportForm() {
-  const handleFileUpload = async (e:
-    React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-      const reader = new FileReader()
-      reader.onload = async (event) => {
-        const text = event.target?.result as string
-        const lines = text.split('\n')
-
-        const parsedData = lines.slice(1).map(line => {
-          const [description, amount] = line.split(',')
-          if(!description || !amount) return null
-          return {
-            description: description.trim(),
-            amount: parseFloat(amount.trim())
-          }
-        }).filter(item => item !== null) as { description: string, amount: number }[]
-
-        if (parsedData.length > 0 ) {
-          await importTransactions(parsedData)
-          alert(`${parsedData.length} transações importadas!`)
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const text = event.target?.result as string
+      const lines = text.split('\n')
+      
+      const parsedData = lines.slice(1).map(line => {
+        const [description, amount] = line.split(',')
+        if (!description || !amount) return null
+        return {
+          description: description.trim(),
+          amount: parseFloat(amount.trim())
         }
+      }).filter(item => item !== null) as { description: string, amount: number }[]
+
+      if (parsedData.length > 0) {
+        await importTransactions(parsedData)
       }
-      reader.readAsText(file)
-    }  
+    }
+    reader.readAsText(file)
+  }
 
   return (
-    <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
-      <p className="text-sm text-gray-600 mb-2 font-medium">Importar via CSV (Descrição, Valor)</p>
+    <div className="flex flex-col gap-2">
+      <label className="text-[10px] font-bold uppercase text-zinc-500 tracking-widest">
+        Importar CSV (Descrição, Valor)
+      </label>
       <input 
         type="file" 
         accept=".csv" 
         onChange={handleFileUpload}
-        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        className="text-xs text-zinc-400
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-full file:border-0
+          file:text-xs file:font-bold
+          file:bg-primary file:text-white
+          hover:file:bg-primary/80
+          cursor-pointer"
       />
     </div>
   )

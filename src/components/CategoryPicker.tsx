@@ -20,7 +20,7 @@ export default function CategoryPicker({
     <select 
       defaultValue={currentCategoryId || ""}
       onChange={(e) => updateTransactionCategory(transactionId, e.target.value)}
-      className="text-xs border border-gray-300 rounded p-1 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+      className="bg-zinc-950 border border-white/10 text-zinc-400 text-[11px] font-medium rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer hover:text-white transition-colors"
     >
       <option value="">Sem categoria</option>
       {categories.map((cat) => (
