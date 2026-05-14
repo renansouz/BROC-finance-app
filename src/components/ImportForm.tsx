@@ -1,6 +1,7 @@
 'use client'
 
 import { importTransactions } from "@/app/actions"
+import { toast } from "sonner" 
 
 export default function ImportForm() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +24,7 @@ export default function ImportForm() {
 
       if (parsedData.length > 0) {
         await importTransactions(parsedData)
+        toast.success(`${parsedData.length} transações importadas com sucesso!`)
       }
     }
     reader.readAsText(file)
