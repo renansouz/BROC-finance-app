@@ -10,7 +10,7 @@ import {
 import { Plus, Upload } from "lucide-react"
 import ImportForm from "./ImportForm"
 
-export default function ActionModal() {
+export default function ActionModal({ accounts }: { accounts: any[] }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -29,7 +29,7 @@ export default function ActionModal() {
               <Upload className="w-4 h-4 text-primary" /> 
               Importar arquivo CSV
             </h3>
-            <ImportForm />
+            <ImportForm accounts={accounts} />
           </div>
           <p className="text-[10px] text-zinc-500 text-center italic">
             Dica: O formulário de adição manual será integrado aqui em breve.

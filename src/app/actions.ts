@@ -48,10 +48,12 @@ export async function addTransaction(formData: FormData) {
   revalidatePath('/')
 }
 
-export async function importTransactions(transactions: { description: string, amount: number }[]) {
+export async function importTransactions(
+  transactions: { description: string, amount: number }[], 
+  financialAccountId: string 
+) {
   const session = await auth()
   if (!session?.user?.id) return
-
   const userId = session.user.id
 
   let financialAccount = await prisma.financialAccount.findFirst({
@@ -70,9 +72,9 @@ export async function importTransactions(transactions: { description: string, am
       amount: t.amount,
       type: t.amount < 0 ? 'EXPENSE' : 'INCOME',
       date: new Date(),
-      financialAccountId: financialAccount!.id,
+      financialAccountId: financialAccountId, 
       categoryId: await identifyCategory(t.description),
-      userId: userId 
+      userId: userId
     }))
   )
 
@@ -95,5 +97,30 @@ export async function updateTransactionCategory(transactionId: string, categoryI
     data: { categoryId: categoryId }
   })
 
+  revalidatePath('/')
+}
+
+export async function addFinancialAccount(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const name = formData.get('name') as string
+  const type = formData.get('type') as string
+  const limit = formData.get('limit') ? parseFloat(formData.get('limit') as string) : null
+  const closingDay = formData.get('closingDay') ? parseInt(formData.get('closingDay') as string) : null
+  const dueDay = formData.get('dueDay') ? parseInt(formData.get('dueDay') as string) : null
+
+  await prisma.financialAccount.create({
+    data: {
+      name,
+      type,
+      limit,
+      closingDay,
+      dueDay,
+      userId: session.user.id
+    }
+  })
+
+  revalidatePath('/accounts')
   revalidatePath('/')
 }
