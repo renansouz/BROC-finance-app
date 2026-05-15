@@ -2,8 +2,6 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 
-const COLORS = ['#8b5cf6', '#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#06b6d4'];
-
 interface CategoryData {
   name: string
   value: number
@@ -11,7 +9,7 @@ interface CategoryData {
 
 export default function CategoryChart({ data }: { data: CategoryData[] }) {
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-75 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -23,8 +21,8 @@ export default function CategoryChart({ data }: { data: CategoryData[] }) {
             paddingAngle={5}
             dataKey="value"
           >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+            {data.map((entry: any, index: number) => (
+              <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
             ))}
           </Pie>
           <Tooltip 

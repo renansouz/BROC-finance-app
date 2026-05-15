@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-    engineType = "library"
-
+  engineType = "library"
 }
 
 datasource db {
@@ -9,13 +8,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  financialAccounts FinancialAccount[]
+  categories        Category[]
+  transactions      Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
 model Account {
   id           String        @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model FinancialAccount {
+  id           String        @id @default(cuid())
   name         String
-  type         String
+  type         String        // CHECKING, SAVINGS, CREDIT
   closingDay   Int?
   dueDay       Int?
   limit        Float?
+  
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -24,21 +80,32 @@ model Account {
 model Category {
   id           String        @id @default(cuid())
   name         String
+  color        String?       @default("#71717a")
+  
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
 
 model Transaction {
-  id          String    @id @default(cuid())
-  description String
-  amount      Float
-  date        DateTime
-  type        String
-  accountId   String
-  account     Account   @relation(fields: [accountId], references: [id])
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  description  String
+  amount       Float
+  type         String    // INCOME, EXPENSE
+  date         DateTime
+  
+  financialAccountId String
+  financialAccount   FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
+  
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

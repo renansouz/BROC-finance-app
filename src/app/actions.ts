@@ -3,18 +3,33 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { identifyCategory } from "@/services/categorizer"
+import { auth } from "@/auth"
 
 export async function addTransaction(formData: FormData) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    throw new Error("Você precisa estar logado para adicionar transações.")
+  }
+
+  const userId = session.user.id
   const description = formData.get('description') as string
   const amount = parseFloat(formData.get('amount') as string)
   
   const type = amount < 0 ? 'EXPENSE' : 'INCOME'
   const categoryId = await identifyCategory(description)
 
-  let account = await prisma.account.findFirst()
-  if (!account) {
-    account = await prisma.account.create({
-      data: { name: 'Conta Principal', type: 'Checking' }
+  let financialAccount = await prisma.financialAccount.findFirst({
+    where: { userId: userId }
+  })
+
+  if (!financialAccount) {
+    financialAccount = await prisma.financialAccount.create({
+      data: { 
+        name: 'Conta Principal', 
+        type: 'Checking',
+        userId: userId 
+      }
     })
   }
 
@@ -24,8 +39,9 @@ export async function addTransaction(formData: FormData) {
       amount,
       type,
       date: new Date(),
-      accountId: account.id,
-      categoryId: categoryId 
+      financialAccountId: financialAccount.id,
+      categoryId: categoryId,
+      userId: userId 
     }
   })
 
@@ -33,10 +49,18 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function importTransactions(transactions: { description: string, amount: number }[]) {
-  let account = await prisma.account.findFirst()
-  if (!account) {
-    account = await prisma.account.create({ 
-      data: { name: 'Conta Principal', type: 'Checking' } 
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const userId = session.user.id
+
+  let financialAccount = await prisma.financialAccount.findFirst({
+    where: { userId: userId }
+  })
+
+  if (!financialAccount) {
+    financialAccount = await prisma.financialAccount.create({ 
+      data: { name: 'Conta Principal', type: 'Checking', userId: userId } 
     })
   }
 
@@ -46,8 +70,9 @@ export async function importTransactions(transactions: { description: string, am
       amount: t.amount,
       type: t.amount < 0 ? 'EXPENSE' : 'INCOME',
       date: new Date(),
-      accountId: account!.id,
-      categoryId: await identifyCategory(t.description) 
+      financialAccountId: financialAccount!.id,
+      categoryId: await identifyCategory(t.description),
+      userId: userId 
     }))
   )
 
@@ -59,8 +84,14 @@ export async function importTransactions(transactions: { description: string, am
 }
 
 export async function updateTransactionCategory(transactionId: string, categoryId: string) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
   await prisma.transaction.update({
-    where: { id: transactionId },
+    where: { 
+      id: transactionId,
+      userId: session.user.id 
+    },
     data: { categoryId: categoryId }
   })
 
