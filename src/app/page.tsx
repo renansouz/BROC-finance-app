@@ -12,13 +12,14 @@ import SummaryCards from "@/components/SummaryCards";
 import CreditCardsSection from "@/components/CreditCardsSection";
 import AnalyticsSection from "@/components/AnalyticsSection";
 import TransactionsSection from "@/components/TransactionsSection";
+import BudgetSection from "@/components/BudgetSection";
+import ShareSummary from "@/components/ShareSummary";
 
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ month?: string; year?: string; q?: string, limit?: string }>;
 }) {
-  
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
@@ -29,22 +30,27 @@ export default async function Home({
   const selectedMonth = parseInt(month || (new Date().getMonth() + 1).toString());
   const selectedYear = parseInt(year || new Date().getFullYear().toString());
 
-  const [accounts, categories, allTransactions, evolutionData] = await Promise.all([
+  const [accounts, categories, allTransactions, evolutionData, budgets] = await Promise.all([
     prisma.financialAccount.findMany({ where: { userId } }),
     prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
     prisma.transaction.findMany({ where: { userId }, include: { financialAccount: true, category: true } }),
-    getEvolutionData(userId, selectedMonth, selectedYear)
-  ]);
+    getEvolutionData(userId, selectedMonth, selectedYear),
+    prisma.budget.findMany({ 
+      where: { userId, month: selectedMonth, year: selectedYear }, 
+      include: { category: true } 
+    })
+]);
 
   const { 
-    transactions, 
-    totalBalance, 
-    totalIncomes, 
-    totalExpenses, 
-    chartData, 
-    topExpenses, 
-    creditCardsData 
-  } = getDashboardData(allTransactions, accounts, categories, selectedMonth, selectedYear, q);
+  transactions, 
+  totalBalance, 
+  totalIncomes, 
+  totalExpenses, 
+  chartData, 
+  topExpenses, 
+  creditCardsData,
+  budgetSummary 
+} = getDashboardData(allTransactions, accounts, categories, budgets, selectedMonth, selectedYear, q);
 
   const totalTransactions = transactions.length;
   const paginatedTransactions = transactions.slice(0, currentLimit);
@@ -68,15 +74,25 @@ export default async function Home({
           <p className="hidden lg:block text-xs text-zinc-500 font-bold uppercase tracking-widest">
             Mês de Competência
           </p>
+          <ShareSummary 
+            month={selectedMonth.toString().padStart(2, '0')}
+            year={selectedYear.toString()}
+            balance={totalBalance}
+            incomes={totalIncomes}
+            expenses={totalExpenses}
+            budgets={budgetSummary}
+          />
         </div>
         <div>
-        <ActionModal accounts={accounts} />
+        <ActionModal accounts={accounts} categories={categories} />
         </div>
       </div>
 
       <SummaryCards balance={totalBalance} incomes={totalIncomes} expenses={totalExpenses} />
       
       <CreditCardsSection data={creditCardsData} />
+
+      <BudgetSection budgets={budgetSummary} />
 
       <AnalyticsSection 
         evolutionData={evolutionData} 

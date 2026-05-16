@@ -15,6 +15,8 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import { LogOut, ChevronDown, Settings, User } from "lucide-react"
+import Link from "next/link"
+
 
 interface UserButtonProps {
   user: {
@@ -59,8 +61,10 @@ export default function UserButton({ user }: UserButtonProps) {
           <span>Meu Perfil</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="focus:bg-white/5 cursor-pointer">
-          <Settings className="mr-2 h-4 w-4 text-zinc-400" />
-          <span>Configurações</span>
+          <Link className="gap-1.5 flex" href="/settings">
+            <Settings className="mr-2 h-4 w-4 text-zinc-400" />
+            <span>Configurações</span>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-white/5" />
         <DropdownMenuItem 

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "library"
 }
 
@@ -20,25 +20,26 @@ model User {
   financialAccounts FinancialAccount[]
   categories        Category[]
   transactions      Transaction[]
+  categoryRules     CategoryRule[]
+  budgets           Budget[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Account {
-  id           String        @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -62,50 +63,79 @@ model VerificationToken {
 }
 
 model FinancialAccount {
-  id           String        @id @default(cuid())
-  name         String
-  type         String        // CHECKING, SAVINGS, CREDIT
-  closingDay   Int?
-  dueDay       Int?
-  limit        Float?
-  
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id         String @id @default(cuid())
+  name       String
+  type       String // CHECKING, SAVINGS, CREDIT
+  closingDay Int?
+  dueDay     Int?
+  limit      Float?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  externalId   String?       @unique
 }
 
 model Category {
-  id           String        @id @default(cuid())
-  name         String
-  color        String?       @default("#71717a")
-  
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id    String  @id @default(cuid())
+  name  String
+  color String? @default("#71717a")
+
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryRules CategoryRule[]
+  budgets       Budget[]
+
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
 
 model Transaction {
-  id           String    @id @default(cuid())
-  description  String
-  amount       Float
-  type         String    // INCOME, EXPENSE
-  date         DateTime
-  
+  id          String   @id @default(cuid())
+  description String
+  amount      Float
+  type        String // INCOME, EXPENSE
+  date        DateTime
+
   financialAccountId String
   financialAccount   FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
-  
-  categoryId   String?
-  category     Category? @relation(fields: [categoryId], references: [id])
-  
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CategoryRule {
+  id         String @id @default(cuid())
+  userId     String
+  text       String
+  categoryId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, text])
+}
+
+model Budget {
+  id         String @id @default(cuid())
+  userId     String
+  categoryId String
+  amount     Float
+  month      Int
+  year       Int
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, month, year])
 }

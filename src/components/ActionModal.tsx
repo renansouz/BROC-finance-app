@@ -1,40 +1,49 @@
 'use client'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Plus, Upload } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Plus, Upload, PenLine } from "lucide-react"
 import ImportForm from "./ImportForm"
+import AddTransactionForm from "./AddTransactionForm"
 
-export default function ActionModal({ accounts }: { accounts: any[] }) {
+interface Props {
+  accounts: any[]
+  categories: any[]
+}
+
+export default function ActionModal({ accounts, categories }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-primary hover:bg-primary/80 text-sm text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all">
-          <Plus className="w-4 h-4" />
-          Nova Transação / Importar
+        <button className="bg-primary hover:bg-primary/80 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all">
+          <Plus className="w-4 h-4" /> Nova Transação
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-[#18181b] border-white/10 text-white">
+      <DialogContent className="bg-[#18181b] border-white/10 text-white max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Gerenciar Transações</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Gerenciar Finanças</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 pt-4">
-          <div className="p-4 bg-zinc-900 rounded-xl border border-white/5">
-            <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-              <Upload className="w-4 h-4 text-primary" /> 
-              Importar arquivo CSV
-            </h3>
-            <ImportForm accounts={accounts} />
-          </div>
-          <p className="text-[10px] text-zinc-500 text-center italic">
-            Dica: O formulário de adição manual será integrado aqui em breve.
-          </p>
-        </div>
+
+        <Tabs defaultValue="manual" className="w-full flex flex-col">
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-900 mb-4">
+            <TabsTrigger value="manual" className="flex items-center gap-2">
+              <PenLine className="w-3 h-3" /> Manual
+            </TabsTrigger>
+            <TabsTrigger value="import" className="flex items-center gap-2">
+              <Upload className="w-3 h-3" /> Importar
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="manual">
+            <AddTransactionForm accounts={accounts} categories={categories} />
+          </TabsContent>
+          
+          <TabsContent value="import">
+            <div className="p-4 bg-zinc-900/50 rounded-xl border border-white/5">
+               <ImportForm accounts={accounts} />
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )

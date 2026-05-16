@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 
 interface CategoryData {
@@ -8,9 +9,16 @@ interface CategoryData {
 }
 
 export default function CategoryChart({ data }: { data: CategoryData[] }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return <div className="h-75" />;
   return (
     <div className="h-75 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer className="min-h-0 min-w-0" width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}

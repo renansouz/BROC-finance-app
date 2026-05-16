@@ -1,40 +1,30 @@
 import prisma from "@/lib/prisma";
 
-const CATEGORY_RULES: Record<string, string> = {
+const STATIC_RULES: Record<string, string> = {
   'uber': 'Transporte',
-  '99app': 'Transporte',
   'ifood': 'Alimentação',
-  'mercado': 'Alimentação',
-  'supermercado': 'Alimentação',
-  'restaurante': 'Alimentação',
   'netflix': 'Lazer',
-  'spotify': 'Lazer',
-  'aluguel': 'Moradia',
-  'condominio': 'Moradia',
-  'luz': 'Contas Fixas',
-  'internet': 'Contas Fixas',
 };
 
-export async function identifyCategory(description: string) {
+export async function identifyCategory(description: string, userId: string) {
   const descLower = description.toLowerCase();
+  const customRule = await prisma.categoryRule.findFirst({
+    where: {
+      userId,
+      text: { contains: descLower, mode: 'insensitive' }
+    },
+    include: { category: true }
+  });
 
-  const keyword = Object.keys(CATEGORY_RULES).find(key => descLower.includes(key));
+  if (customRule) return customRule.categoryId;
 
+  const keyword = Object.keys(STATIC_RULES).find(key => descLower.includes(key));
   if (keyword) {
-    const categoryName = CATEGORY_RULES[keyword];
-
-    let category = await prisma.category.findFirst({
-      where: { name: categoryName }
+    const category = await prisma.category.findFirst({
+      where: { name: STATIC_RULES[keyword], userId }
     });
-
-    if (!category) {
-      category = await prisma.category.create({
-        data: { name: categoryName }
-      });
-    }
-
-    return category.id;
+    return category?.id || null;
   }
 
-  return null;
+  return null;  
 }

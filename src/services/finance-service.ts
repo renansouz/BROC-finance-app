@@ -4,11 +4,12 @@ export function getDashboardData(
   allTransactions: any[],
   accounts: any[],
   categories: any[],
+  budgets: any[],
   selectedMonth: number,
   selectedYear: number,
   q: string | undefined
 ) {
-  // 1. FILTRAGEM POR MÊS E BUSCA
+  // FILTRAGEM POR MÊS E BUSCA
   const transactions = allTransactions.filter((t) => {
     let isInDateRange = false;
     if (t.financialAccount.type === "CREDIT" && t.financialAccount.closingDay) {
@@ -21,12 +22,12 @@ export function getDashboardData(
     return isInDateRange && matchesSearch;
   });
 
-  // 2. TOTAIS 
+  // TOTAIS 
   const totalBalance = transactions.reduce((acc, t) => acc + t.amount, 0);
   const totalIncomes = transactions.filter((t) => t.amount > 0).reduce((acc, t) => acc + t.amount, 0);
   const totalExpenses = transactions.filter((t) => t.amount < 0).reduce((acc, t) => acc + t.amount, 0);
 
-  // 3. GRÁFICO DE CATEGORIAS
+  // GRÁFICO DE CATEGORIAS
   const expensesByCategory = transactions
     .filter((t) => t.amount < 0)
     .reduce((acc: any, t) => {
@@ -40,19 +41,33 @@ export function getDashboardData(
     return { name, value: expensesByCategory[name], color: category?.color || "#71717a" };
   });
 
-  // 4. MAIORES GASTOS
+  // MAIORES GASTOS
   const topExpenses = [...transactions]
     .filter(t => t.amount < 0)
     .sort((a, b) => a.amount - b.amount)
     .slice(0, 5);
 
-  // 5. DADOS DE CARTÃO
+  // DADOS DE CARTÃO
   const creditCardsData = accounts
     .filter((acc) => acc.type === "CREDIT")
     .map((acc) => {
       const invoiceAmount = transactions.filter((t) => t.financialAccountId === acc.id).reduce((sum, t) => sum + t.amount, 0);
       return { ...acc, invoiceAmount };
     });
+
+  // LÓGICA DE BUDGETS
+  const budgetSummary = budgets.map(b => {
+    const spent = transactions
+      .filter(t => t.categoryId === b.categoryId && t.amount < 0)
+      .reduce((acc, t) => acc + Math.abs(t.amount), 0);
+
+    return {
+      categoryName: b.category.name,
+      categoryColor: b.category.color || "#71717a",
+      spent,
+      limit: b.amount
+    };
+  });
 
   return {
     transactions,
@@ -61,6 +76,7 @@ export function getDashboardData(
     totalExpenses,
     chartData,
     topExpenses,
-    creditCardsData
+    creditCardsData,
+    budgetSummary
   };
 }

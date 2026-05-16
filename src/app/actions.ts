@@ -7,41 +7,27 @@ import { auth } from "@/auth"
 
 export async function addTransaction(formData: FormData) {
   const session = await auth()
-  
-  if (!session?.user?.id) {
-    throw new Error("Você precisa estar logado para adicionar transações.")
-  }
+  if (!session?.user?.id) throw new Error("Não autorizado")
 
   const userId = session.user.id
   const description = formData.get('description') as string
   const amount = parseFloat(formData.get('amount') as string)
+  const date = new Date(formData.get('date') as string)
+  const financialAccountId = formData.get('financialAccountId') as string
   
-  const type = amount < 0 ? 'EXPENSE' : 'INCOME'
-  const categoryId = await identifyCategory(description)
+  const manualCategoryId = formData.get('categoryId') as string
 
-  let financialAccount = await prisma.financialAccount.findFirst({
-    where: { userId: userId }
-  })
-
-  if (!financialAccount) {
-    financialAccount = await prisma.financialAccount.create({
-      data: { 
-        name: 'Conta Principal', 
-        type: 'Checking',
-        userId: userId 
-      }
-    })
-  }
+  const categoryId = manualCategoryId || await identifyCategory(description, userId)
 
   await prisma.transaction.create({
     data: {
       description,
       amount,
-      type,
-      date: new Date(),
-      financialAccountId: financialAccount.id,
-      categoryId: categoryId,
-      userId: userId 
+      type: amount < 0 ? 'EXPENSE' : 'INCOME',
+      date,
+      financialAccountId,
+      categoryId: categoryId || null, 
+      userId
     }
   })
 
@@ -73,7 +59,7 @@ export async function importTransactions(
       type: t.amount < 0 ? 'EXPENSE' : 'INCOME',
       date: new Date(),
       financialAccountId: financialAccountId, 
-      categoryId: await identifyCategory(t.description),
+      categoryId: await identifyCategory(t.description, userId),
       userId: userId
     }))
   )
@@ -89,15 +75,70 @@ export async function updateTransactionCategory(transactionId: string, categoryI
   const session = await auth()
   if (!session?.user?.id) return
 
-  await prisma.transaction.update({
-    where: { 
-      id: transactionId,
-      userId: session.user.id 
-    },
+  const transaction = await prisma.transaction.update({
+    where: { id: transactionId, userId: session.user.id },
     data: { categoryId: categoryId }
   })
 
+  const ruleText = transaction.description.split(' ').slice(0, 2).join(' ').toLowerCase();
+
+  await prisma.categoryRule.upsert({
+    where: {
+      userId_text: {
+        userId: session.user.id,
+        text: ruleText
+      }
+    },
+    update: { categoryId: categoryId },
+    create: {
+      userId: session.user.id,
+      text: ruleText,
+      categoryId: categoryId
+    }
+  })
+
   revalidatePath('/')
+}
+
+export async function upsertBudget(
+  categoryId: string, 
+  amount: number, 
+  month: number, 
+  year: number,
+  allYear: boolean 
+) {  
+  const session = await auth()
+  if (!session?.user?.id) return
+  const userId = session.user.id
+
+  const monthsToUpdate = allYear 
+    ? Array.from({ length: 13 - month }, (_, i) => month + i) 
+    : [month]
+
+  for (const m of monthsToUpdate) {
+    await prisma.budget.upsert({
+      where: {
+        userId_categoryId_month_year: {
+          userId,
+          categoryId,
+          month: m,
+          year
+        }
+      },
+      update: { amount },
+      create: {
+        userId,
+        categoryId,
+        amount,
+        month: m,
+        year
+      }
+    })
+  }
+
+  revalidatePath('/')
+  revalidatePath('/settings')
+
 }
 
 export async function addFinancialAccount(formData: FormData) {
