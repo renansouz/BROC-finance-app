@@ -4,6 +4,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, Settings as SettingsIcon } from "lucide-react"
 import BudgetModal from "@/components/BudgetModal"
+import AssetForm from "@/components/AssetForm";
+import LiabilityForm from "@/components/LiabilityForm";
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<any> }) {
   const session = await auth()
@@ -62,6 +64,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           })}
         </div>
       </section>
+
+      <section className="max-w-2xl mx-auto space-y-6 pt-10 border-t border-white/5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-black">Patrimônio e Dívidas</h2>
+            <p className="text-zinc-500 text-sm">Gerencie seus bens imobilizados e financiamentos.</p>
+          </div>
+          <div className="flex gap-2">
+            <AssetForm />
+            <LiabilityForm />
+          </div>
+        </div>
+      </section>
+
     </div>
   )
 }

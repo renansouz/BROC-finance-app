@@ -1,6 +1,17 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import EvolutionChart from "./EvolutionChart";
-import CategoryChart from "./CategoryChart";
+import dynamic from 'next/dynamic';
+
+const EvolutionChart = dynamic(() => import('./EvolutionChart'), { 
+  ssr: false,
+  loading: () => <div className="h-75 w-full bg-zinc-900/20 animate-pulse rounded-xl" /> 
+});
+
+const CategoryChart = dynamic(() => import('./CategoryChart'), { 
+  ssr: false,
+  loading: () => <div className="h-75 w-full bg-zinc-900/20 animate-pulse rounded-xl" />
+});
 
 interface Props {
   evolutionData: any[];
@@ -14,19 +25,31 @@ export default function AnalyticsSection({ evolutionData, chartData, topExpenses
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-1 bg-[#18181b] border-white/10 p-6">
-        <CardHeader className="px-0 pt-0"><CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Evolução de Fluxo</CardTitle></CardHeader>
-        <CardContent className="px-0"><EvolutionChart data={evolutionData} /></CardContent>
-      </Card>
-
-      <Card className="bg-[#18181b] border-white/10 p-6">
-        <CardHeader className="px-0 pt-0"><CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Gastos por Categoria</CardTitle></CardHeader>
+        <CardHeader className="px-0 pt-0">
+          <CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Evolução de Fluxo</CardTitle>
+        </CardHeader>
         <CardContent className="px-0">
-          {chartData.length > 0 ? <CategoryChart data={chartData} /> : <div className="h-75 flex items-center justify-center text-zinc-500 italic">Sem dados.</div>}
+          <EvolutionChart data={evolutionData} />
         </CardContent>
       </Card>
 
       <Card className="bg-[#18181b] border-white/10 p-6">
-        <CardHeader className="px-0 pt-0"><CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Maiores Gastos</CardTitle></CardHeader>
+        <CardHeader className="px-0 pt-0">
+          <CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Gastos por Categoria</CardTitle>
+        </CardHeader>
+        <CardContent className="px-0">
+          {chartData.length > 0 ? (
+            <CategoryChart data={chartData} />
+          ) : (
+            <div className="h-75 flex items-center justify-center text-zinc-500 italic text-sm">Sem dados.</div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="bg-[#18181b] border-white/10 p-6">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle className="text-lg font-bold uppercase tracking-tighter text-zinc-500">Maiores Gastos</CardTitle>
+        </CardHeader>
         <CardContent className="px-0 space-y-4">
           {topExpenses.map((expense) => (
             <div key={expense.id} className="flex justify-between items-center border-b border-white/5 pb-2 last:border-0">

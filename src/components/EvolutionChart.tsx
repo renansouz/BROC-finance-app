@@ -18,7 +18,7 @@ export default function EvolutionChart({ data }: { data: EvolutionData[] }) {
   }, []);
   if (!isMounted) return <div className='h-75' /> 
   return (
-    <div className="h-75 w-full">
+    <div className="h-75 w-full min-h-0 min-w-0">
       <ResponsiveContainer className="min-h-0 min-w-0" width="100%" height="100%">
         <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />

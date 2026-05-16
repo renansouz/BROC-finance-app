@@ -165,3 +165,45 @@ export async function addFinancialAccount(formData: FormData) {
   revalidatePath('/accounts')
   revalidatePath('/')
 }
+
+export async function addAsset(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const name = formData.get('name') as string
+  const type = formData.get('type') as string
+  const value = parseFloat(formData.get('value') as string)
+
+  await prisma.asset.create({
+    data: {
+      name,
+      type,
+      value,
+      userId: session.user.id
+    }
+  })
+
+  revalidatePath('/settings')
+  revalidatePath('/')
+}
+
+export async function addLiability(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const name = formData.get('name') as string
+  const type = formData.get('type') as string
+  const totalAmount = parseFloat(formData.get('totalAmount') as string)
+
+  await prisma.liability.create({
+    data: {
+      name,
+      type,
+      totalAmount,
+      userId: session.user.id
+    }
+  })
+
+  revalidatePath('/')
+  revalidatePath('/settings')
+}

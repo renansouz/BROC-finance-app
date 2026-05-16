@@ -17,13 +17,16 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  financialAccounts FinancialAccount[]
-  categories        Category[]
-  transactions      Transaction[]
-  categoryRules     CategoryRule[]
-  budgets           Budget[]
-  integrations      Integration[]
-  investments Investment[]
+  financialAccounts         FinancialAccount[]
+  categories             Category[]
+  transactions           Transaction[]
+  categoryRules          CategoryRule[]
+  budgets                Budget[]
+  integrations           Integration[]
+  investments            Investment[]
+  snapshots              WealthSnapshot[]
+  assets                 Asset[]
+  liabilities            Liability[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,4 +178,44 @@ model Investment {
 
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
+}
+
+model WealthSnapshot {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  month     Int
+  year      Int
+  amount    Float    
+  
+  createdAt DateTime @default(now())
+
+  @@unique([userId, month, year])
+}
+
+model Asset {
+  id        String   @id @default(cuid())
+  name      String  
+  type      String  
+  value     Float   
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Liability {
+  id          String   @id @default(cuid())
+  name        String   
+  type        String 
+  totalAmount Float  
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
