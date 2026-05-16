@@ -22,6 +22,8 @@ model User {
   transactions      Transaction[]
   categoryRules     CategoryRule[]
   budgets           Budget[]
+  integrations      Integration[]
+  investments Investment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -74,9 +76,12 @@ model FinancialAccount {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   transactions Transaction[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  externalId   String?       @unique
+  integrations Integration[]
+  investments Investment[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  externalId String?  @unique
 }
 
 model Category {
@@ -138,4 +143,36 @@ model Budget {
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([userId, categoryId, month, year])
+}
+
+model Integration {
+  id     String @id @default(cuid())
+  name   String
+  apiKey String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  financialAccountId String
+  financialAccount   FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Investment {
+  id                 String           @id @default(cuid())
+  name               String          
+  type               String          
+  initialAmount      Float           
+  currentAmount      Float           
+  startDate          DateTime         @default(now())
+  
+  userId             String
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  financialAccountId String
+  financialAccount   FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
+
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }

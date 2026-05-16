@@ -14,6 +14,7 @@ import AnalyticsSection from "@/components/AnalyticsSection";
 import TransactionsSection from "@/components/TransactionsSection";
 import BudgetSection from "@/components/BudgetSection";
 import ShareSummary from "@/components/ShareSummary";
+import WealthSummary from "@/components/WealthSummary";
 
 export default async function Home({
   searchParams,
@@ -30,15 +31,16 @@ export default async function Home({
   const selectedMonth = parseInt(month || (new Date().getMonth() + 1).toString());
   const selectedYear = parseInt(year || new Date().getFullYear().toString());
 
-  const [accounts, categories, allTransactions, evolutionData, budgets] = await Promise.all([
-    prisma.financialAccount.findMany({ where: { userId } }),
-    prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
-    prisma.transaction.findMany({ where: { userId }, include: { financialAccount: true, category: true } }),
-    getEvolutionData(userId, selectedMonth, selectedYear),
-    prisma.budget.findMany({ 
-      where: { userId, month: selectedMonth, year: selectedYear }, 
-      include: { category: true } 
-    })
+  const [accounts, categories, allTransactions, evolutionData, budgets, investments] = await Promise.all([
+  prisma.financialAccount.findMany({ where: { userId } }),
+  prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
+  prisma.transaction.findMany({ where: { userId }, include: { financialAccount: true, category: true } }),
+  getEvolutionData(userId, selectedMonth, selectedYear),
+  prisma.budget.findMany({ 
+    where: { userId, month: selectedMonth, year: selectedYear }, 
+    include: { category: true } 
+  }),
+  prisma.investment.findMany({ where: { userId } }) 
 ]);
 
   const { 
@@ -54,6 +56,14 @@ export default async function Home({
 
   const totalTransactions = transactions.length;
   const paginatedTransactions = transactions.slice(0, currentLimit);
+
+  const totalInvestedCurrent = investments.reduce((acc, inv) => acc + inv.currentAmount, 0);
+  const totalInvestedInitial = investments.reduce((acc, inv) => acc + inv.initialAmount, 0);
+
+  const wealth = {
+    totalWealth: totalBalance + totalInvestedCurrent,
+    totalYield: totalInvestedCurrent - totalInvestedInitial
+  };
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white p-4 md:p-10 space-y-8 font-sans">
@@ -87,6 +97,8 @@ export default async function Home({
         <ActionModal accounts={accounts} categories={categories} />
         </div>
       </div>
+
+      <WealthSummary totalWealth={wealth.totalWealth} totalYield={wealth.totalYield} />
 
       <SummaryCards balance={totalBalance} incomes={totalIncomes} expenses={totalExpenses} />
       
