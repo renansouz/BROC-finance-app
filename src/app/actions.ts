@@ -207,3 +207,23 @@ export async function addLiability(formData: FormData) {
   revalidatePath('/')
   revalidatePath('/settings')
 }
+
+export async function addBill(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const name = formData.get('name') as string
+  const amount = parseFloat(formData.get('amount') as string)
+  const dueDay = parseInt(formData.get('dueDay') as string)
+
+  await prisma.bill.create({
+    data: {
+      name,
+      amount,
+      dueDay,
+      userId: session.user.id
+    }
+  })
+
+  revalidatePath('/')
+}

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FINANCE.RDEV | Inteligência Financeira",
+  title: "BROQ. | Inteligência Financeira",
   description: "Seu sistema pessoal de gestão de patrimônio e automação financeira.",
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${geistSans.className} antialiased bg-[#09090b] text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} ${geistSans.className} antialiased bg-background text-white`}
       >
         {children}
         <Toaster theme="dark" position="bottom-right" richColors />

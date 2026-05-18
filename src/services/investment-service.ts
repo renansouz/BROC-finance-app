@@ -1,28 +1,32 @@
 export function calculateWealth(
-  accounts: any[] = [],   
-  investments: any[] = [], 
-  assets: any[] = [], 
+  accounts: any[] = [],
+  investments: any[] = [],
+  assets: any[] = [],
   liabilities: any[] = []
 ) {
+  const totalInAccounts = accounts.reduce((acc, curr) => acc + (curr.balance || 0), 0);
+  
+  // Separamos os investimentos por tipo
+  const liquidInvestments = investments.filter(inv => !['FGTS', 'PENSION'].includes(inv.type));
+  const longTermInvestments = investments.filter(inv => ['FGTS', 'PENSION'].includes(inv.type));
 
-  const totalInAccounts = (accounts || []).reduce((acc, curr) => acc + (curr.balance || 0), 0);
-  const totalInvested = investments.reduce((acc, inv) => acc + inv.currentAmount, 0);
+  const totalLiquidInvested = liquidInvestments.reduce((acc, inv) => acc + inv.currentAmount, 0);
+  const totalLongTerm = longTermInvestments.reduce((acc, inv) => acc + inv.currentAmount, 0);
   const totalAssetsValue = assets.reduce((acc, asset) => acc + asset.value, 0);
   const totalLiabilities = liabilities.reduce((acc, liab) => acc + liab.totalAmount, 0);
 
-  // Ativos totais
-  const assetsTotal = totalInAccounts + totalInvested + totalAssetsValue;
+  // Ativos Totais
+  const assetsTotal = totalInAccounts + totalLiquidInvested + totalLongTerm + totalAssetsValue;
   
-  // Patrimônio Líquido
-  const netWorth = assetsTotal - totalLiabilities;
-
-  // Rendimento dos investimentos
-  const totalYield = investments.reduce((acc, inv) => acc + (inv.currentAmount - inv.initialAmount), 0);
+  // Patrimônio Disponível
+  const availableWealth = totalInAccounts + totalLiquidInvested - totalLiabilities;
 
   return {
-    totalWealth: netWorth, 
+    totalWealth: assetsTotal - totalLiabilities, // Net Worth total
+    availableWealth,                             // Net Worth Líquido (Realidade imediata)
+    longTermWealth: totalLongTerm,               // FGTS + Previdência
     assetsTotal,
     liabilitiesTotal: totalLiabilities,
-    totalYield,
+    totalYield: investments.reduce((acc, inv) => acc + (inv.currentAmount - inv.initialAmount), 0),
   };
 }

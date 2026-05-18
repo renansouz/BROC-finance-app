@@ -1,4 +1,4 @@
-# FINANCE.RDEV 🚀
+# BROQ. 🚀
 
 <p align="left">
   <img src="https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
@@ -17,7 +17,7 @@ Intelligent multi-user personal finance management system featuring automated le
 
 ## Introduction
 
-FINANCE.RDEV is a high-performance financial engine designed to eliminate manual tracking. Built with a modern tech stack, it transforms raw banking data into actionable insights through a fintech-inspired interface. 
+BROQ. is a high-performance financial engine designed to eliminate manual tracking. Built with a modern tech stack, it transforms raw banking data into actionable insights through a fintech-inspired interface.
 
 The core philosophy of the project is **"Data-First"**: a robust architecture where accounts, transactions, and investments are unified into a single source of truth, enabling automated reporting, budgeting, and future planning.
 
@@ -26,6 +26,7 @@ The core philosophy of the project is **"Data-First"**: a robust architecture wh
 The application is built on **Next.js 15 (App Router)** and follows a **Modular Monolith** architecture. It implements **Multi-tenancy (User Isolation)** at the database level, ensuring that each user has a private and secure environment.
 
 ### Core Capabilities (Implemented):
+
 - **Multi-user Authentication:** Secure Google Login via Auth.js (NextAuth).
 - **Intelligent Categorization:** A rule-based engine that "learns" from user behavior and automatically categorizes new transactions.
 - **Advanced Dashboard:** Real-time analytics including Monthly Evolution, Category Distribution, and Top Expenses.
@@ -87,23 +88,27 @@ src/
 ```
 
 ### Key Patterns
+
 - **Services Layer:** All complex calculations (budgets, totals, charts) are isolated in services for better maintainability.
 - **Prisma Adapters:** Used for seamless integration between Auth.js and PostgreSQL.
 - **Responsive Stacking:** Tables that transform into interactive cards for mobile users.
 
-## Roadmap 
+## Roadmap
 
 ### Automation & Connectivity (Current Priority)
+
 - [ ] **Open Finance Integration:** Direct connection with Sofisa Bank and others via API (Pluggy/Belvo).
 - [ ] **n8n Automation:** Webhooks to receive real-time transaction alerts from banking partners.
 - [ ] **Spending Goals (Budgets):** Visual progress bars for monthly category limits.
 
 ### Wealth Management
+
 - [ ] **Investment Tracking:** Real-time B3 (Stocks/REITs) and Fixed Income (CDB/Tesouro) monitoring.
 - [ ] **Economic Indicators:** Dashboard integration with IPCA, SELIC, and Ibovespa.
 - [ ] **Asset Management:** Tracking physical goods (Real Estate, Vehicles) and FGTS.
 
 ### Intelligence
+
 - [ ] **Predictive Analysis:** AI-powered spending projections for the next 3 months.
 - [ ] **Automated Alerts:** WhatsApp/Telegram notifications via n8n for budget overruns.
 - [ ] **PDF Executive Reports:** Monthly financial performance summaries.

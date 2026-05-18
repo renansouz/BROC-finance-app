@@ -1,24 +1,20 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 
-interface CategoryData {
-  name: string
-  value: number
-}
-
-export default function CategoryChart({ data }: { data: CategoryData[] }) {
-  const [isMounted, setIsMounted] = useState(false);
+export default function CategoryChart({ data }: { data: any[] }) {
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
-  if (!isMounted) return <div className="h-75" />;
+  if (!mounted) return <div className="h-75 w-full bg-zinc-900/10 animate-pulse rounded-xl" />
+
   return (
-    <div className="h-75 w-full">
-      <ResponsiveContainer className="min-h-0 min-w-0" width="100%" height="100%">
+    <div className="h-75 w-full min-h-0 min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <PieChart>
           <Pie
             data={data}
@@ -28,16 +24,17 @@ export default function CategoryChart({ data }: { data: CategoryData[] }) {
             outerRadius={80}
             paddingAngle={5}
             dataKey="value"
+            stroke="none"
           >
-            {data.map((entry: any, index: number) => (
-              <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color || '#3f3f46'} />
             ))}
           </Pie>
           <Tooltip 
-            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px' }}
-            itemStyle={{ color: '#fff' }}
+            contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '12px' }}
+            itemStyle={{ color: '#fff', fontSize: '12px' }}
           />
-          <Legend iconType="circle" />
+          <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
         </PieChart>
       </ResponsiveContainer>
     </div>

@@ -7,14 +7,13 @@ export default async function Header() {
   if (!session?.user?.id) redirect("/login");
   
   return (
-    <header className="flex items-center justify-between pb-6 border-b border-white/10">
+    <header className="flex items-center justify-between pb-6 border-b border-white/5">
       <div>
-        <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-white">
-          FINANCE.<span className="text-primary">RDEV</span>
-        </h1>
-        <p className="hidden md:block text-zinc-500 text-xs font-medium">Sua inteligência financeira pessoal.</p>
+        <h2 className="text-xl font-bold text-zinc-100 tracking-tight">Dashboard</h2>
+        <p className="hidden md:block text-zinc-500 text-xs font-medium uppercase tracking-widest">Visão Geral do Patrimônio</p>
       </div>
-      <UserButton user={session!.user} />
+
+      <UserButton user={session.user} />
     </header>
   )
 }

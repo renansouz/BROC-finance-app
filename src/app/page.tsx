@@ -1,156 +1,93 @@
+import Link from "next/link";
+import { ArrowRight, BarChart3, Shield, Zap } from "lucide-react";
 import { auth } from "@/auth";
-import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { performUserOnboarding } from "@/services/onboarding";
-import { getDashboardData } from "@/services/finance-service";
-import { getEvolutionData } from "@/services/evolution-service";
+import Logo from "@/components/Logo";
 
-import UserButton from "@/components/UserButton";
-import MonthPicker from "@/components/MonthPicker";
-import ActionModal from "@/components/ActionModal";
-import SummaryCards from "@/components/SummaryCards";
-import CreditCardsSection from "@/components/CreditCardsSection";
-import AnalyticsSection from "@/components/AnalyticsSection";
-import TransactionsSection from "@/components/TransactionsSection";
-import BudgetSection from "@/components/BudgetSection";
-import ShareSummary from "@/components/ShareSummary";
-import WealthSummary from "@/components/WealthSummary";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import WealthEvolutionChart from "@/components/WealthEvolutionChart";
-import Header from "@/components/Header";
-import { getEconomicIndicators } from "@/services/economic-service";
-import { calculateWealth } from "@/services/investment-service";
-import EconomicIndicators from "@/components/EconomicIndicators";
-import WealthSection from "@/components/WealthSection";
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ month?: string; year?: string; q?: string, limit?: string }>;
-}) {
+export default async function LandingPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
-  const userId = session.user.id;
-
-  await performUserOnboarding(userId);
-  const { month, year, q, limit } = await searchParams;
-  const currentLimit = parseInt(limit || "10");
-  const selectedMonth = parseInt(month || (new Date().getMonth() + 1).toString());
-  const selectedYear = parseInt(year || new Date().getFullYear().toString());
-
-  const [accounts, categories, allTransactions, evolutionData, budgets, investments, indicators, assets] = await Promise.all([
-  prisma.financialAccount.findMany({ where: { userId } }),
-  prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
-  prisma.transaction.findMany({ where: { userId }, include: { financialAccount: true, category: true } }),
-  getEvolutionData(userId, selectedMonth, selectedYear),
-  prisma.budget.findMany({ 
-    where: { userId, month: selectedMonth, year: selectedYear }, 
-    include: { category: true } 
-  }),
-  prisma.investment.findMany({ where: { userId } }) ,
-  getEconomicIndicators(),
-  prisma.asset.findMany({ where: { userId } }) 
-]);
-
-  const { 
-  transactions, 
-  totalBalance, 
-  totalIncomes, 
-  totalExpenses, 
-  chartData, 
-  topExpenses, 
-  creditCardsData,
-  budgetSummary 
-} = getDashboardData(allTransactions, accounts, categories, budgets, selectedMonth, selectedYear, q);
-
-  const totalTransactions = transactions.length;
-  const paginatedTransactions = transactions.slice(0, currentLimit);
-
-  const snapshots = await prisma.wealthSnapshot.findMany({
-    where: { userId },
-    orderBy: [{ year: 'asc' }, { month: 'asc' }]
-  });
-
-  const wealthEvolutionData = snapshots.map(s => ({
-    month: `${s.month}/${s.year}`,
-    amount: s.amount
-  }));
-
-  const accountsWithBalance = accounts.map(acc => {
-    const balance = allTransactions
-      .filter(t => t.financialAccountId === acc.id)
-      .reduce((sum, t) => sum + t.amount, 0);
-    return { ...acc, balance };
-  });
-
-  const wealth = calculateWealth(accountsWithBalance, investments, assets);
-
+  if (session) redirect("/dashboard");
+  
   return (
-    <div className="min-h-screen bg-[#09090b] text-white p-4 md:p-10 space-y-8 font-sans">
-      <Header />
-
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/2 p-4 rounded-2xl border border-white/5">
-        <div className="flex items-center gap-4">
-          <MonthPicker />
-          <div className="w-px h-6 bg-white/10 hidden md:block" />
-          <p className="hidden lg:block text-xs text-zinc-500 font-bold uppercase tracking-widest">
-            Mês de Competência
-          </p>
-          <ShareSummary 
-            month={selectedMonth.toString().padStart(2, '0')}
-            year={selectedYear.toString()}
-            balance={totalBalance}
-            incomes={totalIncomes}
-            expenses={totalExpenses}
-            budgets={budgetSummary}
-          />
-        </div>
-        <div>
-        <ActionModal accounts={accounts} categories={categories} />
-        </div>
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-25%] left-[-10%] w-[70%] h-[70%] bg-primary/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-500/5 blur-[120px] rounded-full" />
       </div>
 
-      <div className="lg:col-span-1">
-        <WealthSummary totalWealth={wealth.totalWealth} totalYield={wealth.totalYield} />
+      <nav className="relative z-10 flex items-center justify-between p-8 max-w-7xl mx-auto">
+        <Logo />
+        <Link 
+          href="/dashboard" 
+          className="text-sm font-bold bg-white text-black px-6 py-3 rounded-full hover:bg-zinc-200 transition-all shadow-lg active:scale-95"
+        >
+          Acessar App
+        </Link>
+      </nav>
+
+      <main className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-16 pb-32 max-w-5xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          O novo padrão da gestão patrimonial
+        </div>
         
-        <div className="mt-6">
-          <EconomicIndicators indicators={indicators} /> 
+        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.85]">
+          Sua riqueza sob uma <br />
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-400 to-indigo-400">
+            nova perspectiva.
+          </span>
+        </h1>
+
+        <p className="text-zinc-400 text-lg md:text-xl max-w-2xl mb-12 font-medium leading-relaxed">
+          O <span className="text-white font-bold">BROQ.</span> consolida seus ativos e gastos em uma interface de alta performance. Simples. Inteligente. Imparável.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-10 py-5 rounded-2xl transition-all shadow-2xl shadow-primary/20 group text-lg"
+          >
+            Começar jornada 
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <button className="px-10 py-5 rounded-2xl font-bold border border-white/10 hover:bg-white/5 transition-all text-zinc-300 text-lg">
+            Ver como funciona
+          </button>
         </div>
-      </div>
-      <SummaryCards balance={totalBalance} incomes={totalIncomes} expenses={totalExpenses} />
-      
-      <CreditCardsSection data={creditCardsData} />
 
-      <WealthSection data={wealthEvolutionData} />
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
-          <p className="text-[10px] text-zinc-500 font-bold uppercase">Selic (Últ. Mês)</p>
-          <p className="text-lg font-black text-white">{indicators.selic}%</p>
+        <div className="mt-28 w-full aspect-video bg-zinc-900/50 rounded-[40px] border border-white/10 shadow-[0_0_100px_-20px_rgba(139,92,246,0.15)] overflow-hidden relative group p-4">
+           <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10" />
+           <div className="w-full h-full rounded-[24px] overflow-hidden border border-white/5 bg-[#0c0c0e]">
+              <img 
+                 src="https://i.imgur.com/6knbgSD.png" 
+                 alt="broq Dashboard Preview" 
+                 className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-700"
+              />
+           </div>
+           <div className="absolute inset-0 flex items-center justify-center z-20">
+              <div className="px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                Interface Premium broq.
+              </div>
+           </div>
         </div>
-        <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
-          <p className="text-[10px] text-zinc-500 font-bold uppercase">IPCA (Inflação)</p>
-          <p className="text-lg font-black text-rose-500">{indicators.ipca}%</p>
-        </div>
-      </div>
+      </main>
 
-      <BudgetSection budgets={budgetSummary} />
-
-      <AnalyticsSection 
-        evolutionData={evolutionData} 
-        chartData={chartData} 
-        topExpenses={topExpenses} 
-      />
-
-      <TransactionsSection 
-        transactions={paginatedTransactions}
-        totalTransactions={totalTransactions}
-        currentLimit={currentLimit}
-        categories={categories}
-        month={selectedMonth.toString().padStart(2, '0')}
-        year={selectedYear.toString()}
-        q={q || ""}
-      />
+      {/* Seção de Features */}
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pb-32 grid md:grid-cols-3 gap-8">
+        {[
+          { icon: Zap, title: "Automação Real", desc: "Integração via n8n para processar e receber seus gastos em tempo real." },
+          { icon: BarChart3, title: "Visão 360º", desc: "Patrimônio líquido, ativos imobilizados e investimentos em um só lugar." },
+          { icon: Shield, title: "Cofre de Dados", desc: "Isolamento total e criptografia de ponta para sua privacidade financeira." },
+        ].map((feat, i) => (
+          <div key={i} className="p-10 bg-white/[0.03] border border-white/5 rounded-[32px] hover:border-primary/30 transition-all duration-500 group">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+               <feat.icon className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-bold text-xl mb-3 text-zinc-100">{feat.title}</h3>
+            <p className="text-zinc-500 text-sm leading-relaxed">{feat.desc}</p>
+          </div>
+        ))}
+      </section>
     </div>
   );
 }

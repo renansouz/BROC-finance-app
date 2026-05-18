@@ -7,6 +7,8 @@ export async function getEconomicIndicators() {
       fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json")
     ]);
 
+    if (!selicRes.ok || !ipcaRes.ok) throw new Error("API do BCB fora do ar");
+
     const selicData = await selicRes.json();
     const ipcaData = await ipcaRes.json();
 
