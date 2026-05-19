@@ -227,3 +227,16 @@ export async function addBill(formData: FormData) {
 
   revalidatePath('/')
 }
+
+export async function saveOnboarding(data: any) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  await prisma.userSettings.upsert({
+    where: { userId: session.user.id },
+    update: { ...data, isOnboardingComplete: true },
+    create: { userId: session.user.id, ...data, isOnboardingComplete: true }
+  })
+
+  revalidatePath('/dashboard')
+}

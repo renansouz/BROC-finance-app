@@ -21,7 +21,7 @@ export default function ShareSummary({ month, year, balance, incomes, expenses, 
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
   const handleCopy = () => {
-    let text = `📊 *BROQ. - Resumo de ${month}/${year}*\n\n`;
+    let text = `📊 *BROC. - Resumo de ${month}/${year}*\n\n`;
     text += `💰 *Saldo:* ${format(balance)}\n`;
     text += `📈 *Receitas:* ${format(incomes)}\n`;
     text += `📉 *Despesas:* ${format(expenses)}\n\n`;
@@ -34,7 +34,7 @@ export default function ShareSummary({ month, year, balance, incomes, expenses, 
       });
     }
 
-    text += `\n_Gerado automaticamente pelo BROQ._`;
+    text += `\n_Gerado automaticamente pelo BROC._`;
 
     navigator.clipboard.writeText(text);
     toast.success("Resumo copiado para a área de transferência!");

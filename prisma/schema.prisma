@@ -28,6 +28,7 @@ model User {
   assets                 Asset[]
   liabilities            Liability[]
   bills                  Bill[]
+  settings               UserSettings?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -233,4 +234,19 @@ model Bill {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model UserSettings {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  hasVehicles          Boolean @default(false)
+  hasRealEstate        Boolean @default(false)
+  hasFGTS              Boolean @default(false)
+  hasInvestments       Boolean @default(false)
+  
+  financialGoal        String? // "DEBT", "WEALTH", "ORGANIZATION"
+
+  isOnboardingComplete Boolean @default(false)
 }

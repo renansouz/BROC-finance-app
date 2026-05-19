@@ -16,7 +16,8 @@ export async function getFullDashboard(userId: string, selectedMonth: number, se
     assets, 
     liabilities, 
     bills, 
-    snapshots
+    snapshots,
+    settings 
   ] = await Promise.all([
     prisma.financialAccount.findMany({ where: { userId } }),
     prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
@@ -28,7 +29,8 @@ export async function getFullDashboard(userId: string, selectedMonth: number, se
     prisma.asset.findMany({ where: { userId } }),
     prisma.liability.findMany({ where: { userId } }),
     prisma.bill.findMany({ where: { userId, paid: false } }),
-    prisma.wealthSnapshot.findMany({ where: { userId }, orderBy: [{ year: 'asc' }, { month: 'asc' }] })
+    prisma.wealthSnapshot.findMany({ where: { userId }, orderBy: [{ year: 'asc' }, { month: 'asc' }] }),
+    prisma.userSettings.findUnique({ where: { userId } }) 
   ]);
 
   const finance = getDashboardData(allTransactions, accounts, categories, budgets, selectedMonth, selectedYear, q);
@@ -57,6 +59,7 @@ export async function getFullDashboard(userId: string, selectedMonth: number, se
     evolutionData, 
     indicators,
     categories,
-    accounts
+    accounts: accountsWithBalance,
+    settings: settings || { isOnboardingComplete: false, hasInvestments: false, hasVehicles: false, hasRealEstate: false, hasFGTS: false }
   };
 }

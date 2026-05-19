@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BROQ. | Inteligência Financeira",
+  title: "BROC. | Inteligência Financeira",
   description: "Seu sistema pessoal de gestão de patrimônio e automação financeira.",
 };
 

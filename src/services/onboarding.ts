@@ -23,9 +23,16 @@ export async function performUserOnboarding(userId: string) {
     await prisma.financialAccount.create({
       data: {
         name: "Minha Conta",
-        type: "CHECKING", // Conta Corrente padrão
+        type: "CHECKING", 
         userId: userId
       }
     });
   }
+
+  const settings = await prisma.userSettings.findUnique({ where: { userId } });
+
+  if (!settings) {
+    await prisma.userSettings.create({ data: { userId } });
+  }
+
 }

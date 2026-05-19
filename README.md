@@ -1,4 +1,4 @@
-# BROQ. 🚀
+# BROC. 🚀
 
 <p align="left">
   <img src="https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
@@ -17,7 +17,7 @@ Intelligent multi-user personal finance management system featuring automated le
 
 ## Introduction
 
-BROQ. is a high-performance financial engine designed to eliminate manual tracking. Built with a modern tech stack, it transforms raw banking data into actionable insights through a fintech-inspired interface.
+BROC. is a high-performance financial engine designed to eliminate manual tracking. Built with a modern tech stack, it transforms raw banking data into actionable insights through a fintech-inspired interface.
 
 The core philosophy of the project is **"Data-First"**: a robust architecture where accounts, transactions, and investments are unified into a single source of truth, enabling automated reporting, budgeting, and future planning.
 
