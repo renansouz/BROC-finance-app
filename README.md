@@ -13,7 +13,7 @@
 
 Intelligent multi-user personal finance management system featuring automated learning, banking synchronization, and deep financial analytics.
 
-![Project Preview](https://i.imgur.com/6knbgSD.png)
+![Project Preview](https://i.imgur.com/0S99GsJ.png)
 
 ## Introduction
 
