@@ -20,12 +20,11 @@ export default function MonthPicker() {
 
   const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - 3 + i).toString())
 
-  const handleUpdate = (key: string, value: string) => {
+    const handleUpdate = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set(key, value)
-    router.push(`/?${params.toString()}`)
+    router.push(`/dashboard?${params.toString()}`)
   }
-
   return (
     <div className="flex gap-2 bg-zinc-900 border border-white/10 p-1.5 rounded-xl">
       <select 
@@ -36,7 +35,7 @@ export default function MonthPicker() {
         {months.map(m => <option key={m.value} value={m.value} className="bg-zinc-900">{m.label}</option>)}
       </select>
 
-      <div className="w-[1px] bg-white/10 my-1" />
+      <div className="w-px bg-white/10 my-1" />
 
       <select 
         value={currentYear}

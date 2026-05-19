@@ -9,7 +9,7 @@ export default function AuthenticatedLayout({
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <main className="flex-1 lg:ml-64 p-4 md:p-10">
+      <main className="flex-1 lg:ml-64 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

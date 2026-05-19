@@ -60,6 +60,12 @@ export async function getFullDashboard(userId: string, selectedMonth: number, se
     indicators,
     categories,
     accounts: accountsWithBalance,
-    settings: settings || { isOnboardingComplete: false, hasInvestments: false, hasVehicles: false, hasRealEstate: false, hasFGTS: false }
+    settings: settings || { 
+      isOnboardingComplete: false, 
+      hasInvestments: false, 
+      hasVehicles: false, 
+      hasRealEstate: false, 
+      hasFGTS: false 
+    }
   };
 }

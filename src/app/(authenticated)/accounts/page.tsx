@@ -17,7 +17,7 @@ export default async function AccountsPage() {
   return (
     <div className="min-h-screen bg-[#09090b] text-white p-6 md:p-10 space-y-8">
       <div className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors">
+        <Link href="/dashboard" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors">
           <ChevronLeft className="w-4 h-4" /> Voltar ao Dashboard
         </Link>
         <AccountForm />

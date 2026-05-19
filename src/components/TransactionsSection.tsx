@@ -123,7 +123,7 @@ export default function TransactionsSection({
         {totalTransactions > currentLimit && (
           <div className="p-4 border-t border-white/10 flex justify-center">
             <Link
-              href={`/?month=${month}&year=${year}${q ? `&q=${q}` : ''}&limit=${currentLimit + 10}`}
+              href={`/dashboard?month=${month}&year=${year}${q ? `&q=${q}` : ''}&limit=${currentLimit + 10}`}
               scroll={false}
               className="text-xs font-bold text-primary hover:text-primary/80 uppercase tracking-widest transition-colors"
             >

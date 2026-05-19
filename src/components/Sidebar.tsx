@@ -51,7 +51,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto">
+      {/* <div className="mt-auto">
         <Link 
           href="/pro" 
           className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-2xl group hover:bg-primary/20 transition-all"
@@ -59,7 +59,7 @@ export default function Sidebar() {
           <span className="text-[10px] font-black text-primary uppercase tracking-widest">Upgrade to Pro</span>
           <ArrowUpRight className="w-3 h-3 text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </Link>
-      </div>
+      </div> */}
     </aside>
   )
 }

@@ -21,9 +21,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   ])
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white p-6 md:p-10 space-y-8">
+    <div className="min-h-screen bg-background text-white p-6 md:p-10 space-y-8">
       <header className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm">
+        <Link href="/dashboard" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm">
           <ChevronLeft className="w-4 h-4" /> Voltar ao Dashboard
         </Link>
         <div className="flex items-center gap-2">
@@ -42,7 +42,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           {categories.map((cat) => {
             const budget = budgets.find(b => b.categoryId === cat.id)
             return (
-              <div key={cat.id} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+              <div key={cat.id} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-white/2">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3f3f46' }} />
                   <span className="font-bold text-zinc-200">{cat.name}</span>
