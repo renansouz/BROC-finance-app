@@ -29,6 +29,7 @@ model User {
   liabilities            Liability[]
   bills                  Bill[]
   settings               UserSettings?
+  descriptionRules       DescriptionRule[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -248,5 +249,19 @@ model UserSettings {
   
   financialGoal        String? // "DEBT", "WEALTH", "ORGANIZATION"
 
+  syncMethods          String? @default("MANUAL") // Ex: "EMAIL,FILE"
+  activeBanks          String? @default("") 
+
   isOnboardingComplete Boolean @default(false)
+}
+
+model DescriptionRule {
+  id             String   @id @default(cuid())
+  userId         String
+  originalText   String  
+  cleanedText    String  
+  
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, originalText])
 }

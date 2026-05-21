@@ -17,7 +17,7 @@ export default function CreditCardSummary({ name, invoiceAmount, limit, dueDay }
 
   return (
     <Card className="bg-zinc-900 border-white/10 overflow-hidden relative group">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-400 opacity-50" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary to-purple-400 opacity-50" />
       
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <div className="flex items-center gap-2">

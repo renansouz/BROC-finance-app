@@ -35,37 +35,37 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function importTransactions(
-  transactions: { description: string, amount: number }[], 
-  financialAccountId: string 
+  transactions: { description: string, amount: number, date: Date }[], 
+  financialAccountId: string
 ) {
   const session = await auth()
   if (!session?.user?.id) return
   const userId = session.user.id
 
-  let financialAccount = await prisma.financialAccount.findFirst({
-    where: { userId: userId }
+  const rules = await prisma.descriptionRule.findMany({
+    where: { userId }
   })
 
-  if (!financialAccount) {
-    financialAccount = await prisma.financialAccount.create({ 
-      data: { name: 'Conta Principal', type: 'Checking', userId: userId } 
-    })
-  }
+  const transactionsWithDetails = await Promise.all(
+    transactions.map(async (t) => {
+      // 2. Aplica a regra de nome se existir
+      const rule = rules.find(r => r.originalText === t.description)
+      const cleanDescription = rule ? rule.cleanedText : t.description
 
-  const transactionsWithCategories = await Promise.all(
-    transactions.map(async (t) => ({
-      description: t.description,
-      amount: t.amount,
-      type: t.amount < 0 ? 'EXPENSE' : 'INCOME',
-      date: new Date(),
-      financialAccountId: financialAccountId, 
-      categoryId: await identifyCategory(t.description, userId),
-      userId: userId
-    }))
+      return {
+        description: cleanDescription,
+        amount: t.amount,
+        type: t.amount < 0 ? 'EXPENSE' : 'INCOME',
+        date: new Date(t.date),
+        financialAccountId: financialAccountId,
+        categoryId: await identifyCategory(cleanDescription, userId), // Identifica categoria pelo nome limpo
+        userId: userId
+      }
+    })
   )
 
   await prisma.transaction.createMany({
-    data: transactionsWithCategories
+    data: transactionsWithDetails
   })
 
   revalidatePath('/')
@@ -234,9 +234,64 @@ export async function saveOnboarding(data: any) {
 
   await prisma.userSettings.upsert({
     where: { userId: session.user.id },
-    update: { ...data, isOnboardingComplete: true },
-    create: { userId: session.user.id, ...data, isOnboardingComplete: true }
+    update: { 
+      ...data, 
+      isOnboardingComplete: true 
+    },
+    create: { 
+      userId: session.user.id, 
+      ...data, 
+      isOnboardingComplete: true 
+    }
   })
 
   revalidatePath('/dashboard')
+}
+
+export async function deleteTransaction(id: string) {
+  const session = await auth()
+  if (!session?.user?.id) return
+  await prisma.transaction.delete({ where: { id, userId: session.user.id } })
+  revalidatePath('/')
+}
+
+export async function updateTransactionDescription(id: string, newDescription: string) {
+  const session = await auth()
+  if (!session?.user?.id) return
+  
+  const original = await prisma.transaction.findUnique({ where: { id } })
+  if (!original) return
+  
+  await prisma.transaction.update({
+    where: { id },
+    data: { description: newDescription }
+  })
+  
+  await prisma.descriptionRule.upsert({
+    where: {
+      userId_originalText: { userId: session.user.id, originalText: original.description }
+    },
+    update: { cleanedText: newDescription },
+    create: { userId: session.user.id, originalText: original.description, cleanedText: newDescription }
+  })
+
+  revalidatePath('/')
+}
+
+export async function updateDescriptionAndLearn(id: string, newDescription: string) {
+  const session = await auth()
+  if (!session?.user?.id) return
+
+  const transaction = await prisma.transaction.update({
+    where: { id, userId: session.user.id },
+    data: { description: newDescription }
+  })
+
+  await prisma.descriptionRule.upsert({
+    where: { userId_originalText: { userId: session.user.id, originalText: transaction.description } },
+    update: { cleanedText: newDescription },
+    create: { userId: session.user.id, originalText: transaction.description, cleanedText: newDescription }
+  })
+
+  revalidatePath('/')
 }

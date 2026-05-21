@@ -17,7 +17,7 @@ export default function SearchInput() {
       } else {
         params.delete('q')
       }
-      router.push(`/dashboard?${params.toString()}`)
+      router.push(`/transactions?${params.toString()}`)
     }, 500)
     return () => clearTimeout(timer)
   }, [value, router, searchParams])

@@ -21,11 +21,12 @@ const MENU_ITEMS = [
   { label: "Configurações", href: "/settings", icon: Settings },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ isMobile }: { isMobile?: boolean }) {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r border-border hidden lg:flex flex-col p-8 z-50">
+    <aside className={cn(isMobile ? "flex h-full w-full" : "fixed left-0 top-0 h-screen w-64 hidden lg:flex", "bg-card flex-col p-6 z-50")}
+>
       <div className="mb-10">
         <Logo className="text-3xl" /> 
       </div>

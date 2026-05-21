@@ -25,7 +25,7 @@ export default function CreditCardsSection({ data }: Props) {
         </h2>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6">
         {data.map((card) => (
           <CreditCardSummary
             key={card.id}
