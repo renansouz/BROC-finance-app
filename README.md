@@ -11,69 +11,27 @@
   <img src="https://img.shields.io/badge/n8n_Ready-FF6C37?style=for-the-badge&logo=n8n&logoColor=white" />
 </p>
 
-Intelligent multi-user personal finance management system featuring automated learning, banking synchronization, and deep financial analytics.
+A financial operating system designed for absolute clarity. BROC. unifies your cash flow, wealth evolution, and banking automation into a single, intelligent interface.
 
 ![Project Preview](https://i.imgur.com/0S99GsJ.png)
 
 ## Introduction
 
-BROC. is a high-performance financial engine designed to eliminate manual tracking. Built with a modern tech stack, it transforms raw banking data into actionable insights through a fintech-inspired interface.
-
-The core philosophy of the project is **"Data-First"**: a robust architecture where accounts, transactions, and investments are unified into a single source of truth, enabling automated reporting, budgeting, and future planning.
+BROC. is built for those who demand more than just expense tracking. It is a high-performance engine that eliminates manual friction, transforming fragmented banking data into a unified source of truth. My goal is to provide a "Zero Click" experience where your financial intelligence grows as the system learns from your habits.
 
 ## Technical Overview
 
-The application is built on **Next.js 15 (App Router)** and follows a **Modular Monolith** architecture. It implements **Multi-tenancy (User Isolation)** at the database level, ensuring that each user has a private and secure environment.
+The platform is engineered with **Next.js 15 (App Router)** and follows a **Modular Monolith** architecture. It implements strict **Multi-tenancy** at the database level, ensuring complete data isolation and privacy for every user.
 
-### Core Capabilities (Implemented):
+### Core Capabilities:
 
-- **Multi-user Authentication:** Secure Google Login via Auth.js (NextAuth).
-- **Intelligent Categorization:** A rule-based engine that "learns" from user behavior and automatically categorizes new transactions.
-- **Advanced Dashboard:** Real-time analytics including Monthly Evolution, Category Distribution, and Top Expenses.
-- **Credit Card Engine:** Specialized logic for billing cycles, closing/due dates, and limit tracking.
-- **Automated Onboarding:** Intelligent seeding of default categories and accounts for new users.
-- **Transaction Management:** CSV import, manual entry, real-time search, and server-side pagination.
-
-## User Instructions
-
-### Prerequisites
-
-- Node.js v20+
-- Docker Desktop
-- Google Cloud Console Project (for Auth)
-
-### Installation
-
-```bash
-git clone https://github.com/your-user/finance-app.git
-cd finance-app
-npm install
-```
-
-### Infrastructure & Database
-
-```bash
-docker-compose up -d
-npx prisma generate
-npx prisma migrate dev
-```
-
-### Environment Configuration
-
-Create a `.env` file:
-
-```env
-DATABASE_URL="postgresql://admin:password123@localhost:5432/finance_db?schema=public"
-AUTH_SECRET="your_nextauth_secret"
-AUTH_GOOGLE_ID="your_google_client_id"
-AUTH_GOOGLE_SECRET="your_google_client_secret"
-```
-
-### Run locally
-
-```bash
-npm run dev
-```
+- **Intelligent Onboarding:** A multi-step setup wizard that tailors the entire dashboard based on user assets (Vehicles, Real Estate, FGTS) and preferred synchronization methods.
+- **Universal Data Mapper:** A robust CSV/OFX importer powered by **PapaParse** with dynamic header detection, allowing any bank statement to be processed regardless of column order.
+- **Learning Engine:** A rule-based system that "learns" naming preferences. Renaming a cryptic bank description once creates a permanent rule for all future imports.
+- **Wealth Management 360°:** Real-time calculation of Net Worth by balancing liquid accounts, fixed-income investments, physical assets, and liabilities (loans/financing).
+- **Automated Communication:** Integration with **n8n** and **Telegram Bot API** for proactive financial reporting and real-time wealth alerts.
+- **Market Context:** Direct integration with the **Central Bank of Brazil (BCB)** API to track SELIC and IPCA indicators against portfolio performance.
+- **Modern Sidebar Architecture:** Scalable navigation system designed for a multi-page SaaS experience, including dedicated views for Wealth, Transactions, and Settings.
 
 ## Developer Instructions
 
@@ -84,34 +42,28 @@ src/
 ├── app/          # Routes, Pages, and Server Actions
 ├── components/   # UI Components (shadcn/ui + custom)
 ├── lib/          # Shared utilities (Prisma, Date Utils)
-├── services/     # Business Logic (Finance, Evolution, Onboarding, Categorizer)
+├── services/     # Business Logic (Finance, Wealth, Onboarding, Categorizer)
 ```
 
 ### Key Patterns
 
-- **Services Layer:** All complex calculations (budgets, totals, charts) are isolated in services for better maintainability.
-- **Prisma Adapters:** Used for seamless integration between Auth.js and PostgreSQL.
-- **Responsive Stacking:** Tables that transform into interactive cards for mobile users.
+- **Services Orchestration:** Heavy logic and mathematical calculations are extracted from pages into specialized services (DashboardService, WealthService) for maximum maintainability.
+- **Smart Empty States:** Context-aware guides that replace empty charts with actionable "Next Steps" based on the user's chosen sync method.
+- **Responsive Stacking:** High-density data tables that transform into card-based layouts for a premium mobile experience.
 
 ## Roadmap
 
-### Automation & Connectivity (Current Priority)
+### Real-Time Automation
 
-- [ ] **Open Finance Integration:** Direct connection with Sofisa Bank and others via API (Pluggy/Belvo).
-- [ ] **n8n Automation:** Webhooks to receive real-time transaction alerts from banking partners.
-- [ ] **Spending Goals (Budgets):** Visual progress bars for monthly category limits.
+- [ ] **Email Notification Parsing:** Automated reading of Sofisa, Nubank, and BTG transaction emails via n8n to eliminate manual entry.
+- [ ] **Mobile Push Integration:** Webhook listeners for Android/iOS notifications to capture "coffee-shop" style expenses instantly.
+- [ ] **Open Finance Hybrid:** Integration with banking aggregators (Pluggy/Belvo) for real-time balance syncing.
+- [ ] **Duplicate Detection 2.0:** Advanced metadata matching to ensure automated entries don't overlap with manual uploads.
 
-### Wealth Management
+### Deployment & Scaling
 
-- [ ] **Investment Tracking:** Real-time B3 (Stocks/REITs) and Fixed Income (CDB/Tesouro) monitoring.
-- [ ] **Economic Indicators:** Dashboard integration with IPCA, SELIC, and Ibovespa.
-- [ ] **Asset Management:** Tracking physical goods (Real Estate, Vehicles) and FGTS.
-
-### Intelligence
-
-- [ ] **Predictive Analysis:** AI-powered spending projections for the next 3 months.
-- [ ] **Automated Alerts:** WhatsApp/Telegram notifications via n8n for budget overruns.
-- [ ] **PDF Executive Reports:** Monthly financial performance summaries.
+- [ ] **Production Infrastructure:** Deploying the ecosystem (Next.js + n8n + PostgreSQL) using Docker Compose in a production VPS.
+- [ ] **Cloud Migration:** Transitioning local DB to high-availability providers (Neon/Supabase) and frontend to Vercel.
 
 ## Support
 
